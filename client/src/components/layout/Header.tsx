@@ -24,12 +24,12 @@ const Header = ({ currentPath }: HeaderProps) => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center">
           <Link href="/">
-            <a className="flex items-center">
+            <div className="flex items-center cursor-pointer">
               <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold mr-3">
                 CG
               </div>
               <h1 className="text-2xl font-bold text-gray-800">CryptGen</h1>
-            </a>
+            </div>
           </Link>
         </div>
         
@@ -37,13 +37,13 @@ const Header = ({ currentPath }: HeaderProps) => {
         <nav className="hidden md:flex space-x-8">
           {navLinks.map((link) => (
             <Link key={link.path} href={link.path}>
-              <a className={`font-medium ${
+              <div className={`font-medium cursor-pointer ${
                 currentPath === link.path 
                   ? 'text-purple-600'
                   : 'text-gray-700 hover:text-purple-600'
               }`}>
                 {link.label}
-              </a>
+              </div>
             </Link>
           ))}
         </nav>
@@ -63,8 +63,8 @@ const Header = ({ currentPath }: HeaderProps) => {
         <div className="px-4 py-3 space-y-3 bg-white border-t">
           {navLinks.map((link) => (
             <Link key={link.path} href={link.path}>
-              <a 
-                className={`block w-full text-left py-2 font-medium ${
+              <div 
+                className={`block w-full text-left py-2 font-medium cursor-pointer ${
                   currentPath === link.path 
                     ? 'text-purple-600'
                     : 'text-gray-700 hover:text-purple-600'
@@ -72,7 +72,7 @@ const Header = ({ currentPath }: HeaderProps) => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
-              </a>
+              </div>
             </Link>
           ))}
         </div>
