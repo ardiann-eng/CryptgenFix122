@@ -81,7 +81,13 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    // Ensure role is set if not provided
+    const userData = {
+      ...insertUser,
+      role: insertUser.role || "user",
+      id
+    };
+    const user = userData as User;
     this.users.set(id, user);
     return user;
   }
@@ -203,6 +209,24 @@ export class MemStorage implements IStorage {
   
   // Helper method to initialize data
   private initializeData() {
+    // Create admin user for testing
+    this.createUser({
+      username: "admin",
+      password: "adminpassword", // In a real application, this would be hashed
+      role: "admin",
+      name: "Administrator",
+      email: "admin@cryptgen.com"
+    });
+    
+    // Create regular user for testing
+    this.createUser({
+      username: "user",
+      password: "userpassword", // In a real application, this would be hashed
+      role: "user",
+      name: "Regular User",
+      email: "user@example.com"
+    });
+    
     // Create members
     const coreMembers = [
       {

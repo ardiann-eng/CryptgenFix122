@@ -7,11 +7,17 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").default("user").notNull(), // "user" or "admin"
+  name: text("name"),
+  email: text("email"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  name: true,
+  email: true,
+  role: true,
 });
 
 // Member schema for class members
@@ -19,7 +25,7 @@ export const members = pgTable("members", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   studentId: text("student_id").notNull().unique(),
-  role: text("role").default("member"),
+  role: text("role").default("member").notNull(),
   photoUrl: text("photo_url").notNull(),
 });
 

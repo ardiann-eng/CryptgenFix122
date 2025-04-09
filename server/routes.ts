@@ -1,13 +1,30 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertMemberSchema, insertAnnouncementSchema, insertTransactionSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+  
   // API routes prefix
   const apiPrefix = "/api";
+  
+  // Admin authentication middleware
+  const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    
+    next();
+  };
 
   // Error handler helper
   const handleZodError = (error: unknown) => {
@@ -35,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post(`${apiPrefix}/members`, async (req, res) => {
+  app.post(`${apiPrefix}/members`, requireAdmin, async (req, res) => {
     try {
       const validatedMember = insertMemberSchema.parse(req.body);
       const member = await storage.createMember(validatedMember);
@@ -46,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put(`${apiPrefix}/members/:id`, async (req, res) => {
+  app.put(`${apiPrefix}/members/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedMember = insertMemberSchema.partial().parse(req.body);
@@ -63,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete(`${apiPrefix}/members/:id`, async (req, res) => {
+  app.delete(`${apiPrefix}/members/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteMember(id);
@@ -90,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post(`${apiPrefix}/announcements`, async (req, res) => {
+  app.post(`${apiPrefix}/announcements`, requireAdmin, async (req, res) => {
     try {
       const validatedAnnouncement = insertAnnouncementSchema.parse(req.body);
       const announcement = await storage.createAnnouncement(validatedAnnouncement);
@@ -101,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put(`${apiPrefix}/announcements/:id`, async (req, res) => {
+  app.put(`${apiPrefix}/announcements/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedAnnouncement = insertAnnouncementSchema.partial().parse(req.body);
@@ -118,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete(`${apiPrefix}/announcements/:id`, async (req, res) => {
+  app.delete(`${apiPrefix}/announcements/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteAnnouncement(id);
@@ -145,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post(`${apiPrefix}/transactions`, async (req, res) => {
+  app.post(`${apiPrefix}/transactions`, requireAdmin, async (req, res) => {
     try {
       const validatedTransaction = insertTransactionSchema.parse(req.body);
       const transaction = await storage.createTransaction(validatedTransaction);
@@ -156,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put(`${apiPrefix}/transactions/:id`, async (req, res) => {
+  app.put(`${apiPrefix}/transactions/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedTransaction = insertTransactionSchema.partial().parse(req.body);
@@ -173,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete(`${apiPrefix}/transactions/:id`, async (req, res) => {
+  app.delete(`${apiPrefix}/transactions/:id`, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteTransaction(id);
