@@ -11,3 +11,75 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Custom animations for the modern UI */
+@keyframes float-slow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes float-medium {
+  0% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-20px) translateX(10px); }
+  100% { transform: translateY(0px) translateX(0px); }
+}
+
+@keyframes float-fast {
+  0% { transform: translateY(0px) translateX(0px) scale(1); }
+  33% { transform: translateY(-10px) translateX(10px) scale(1.05); }
+  66% { transform: translateY(5px) translateX(-5px) scale(0.95); }
+  100% { transform: translateY(0px) translateX(0px) scale(1); }
+}
+
+@keyframes slow-zoom {
+  0% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes pulse-subtle {
+  0% { opacity: 1; }
+  50% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@layer utilities {
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+  
+  .animate-float-medium {
+    animation: float-medium 6s ease-in-out infinite;
+  }
+  
+  .animate-float-fast {
+    animation: float-fast 5s ease-in-out infinite;
+  }
+  
+  .animate-slow-zoom {
+    animation: slow-zoom 30s ease-in-out infinite;
+  }
+  
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+  }
+  
+  /* Glass effect for modern UI */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/10 border border-white/20;
+  }
+  
+  /* Text gradient animation */
+  .text-gradient-animate {
+    @apply bg-clip-text text-transparent bg-gradient-to-r;
+    background-size: 200% 200%;
+    animation: gradient-position 3s ease infinite;
+  }
+}
+
+@keyframes gradient-position {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

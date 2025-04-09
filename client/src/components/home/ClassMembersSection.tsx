@@ -12,17 +12,24 @@ interface ClassMember {
 
 const MemberCard = ({ member }: { member: ClassMember }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden member-card">
-      <div className="h-40 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden member-card group hover:shadow-lg transition-all duration-300 border border-purple-50">
+      <div className="h-40 overflow-hidden relative">
         <img 
           src={member.photoUrl} 
           alt={`${member.name}`} 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 member-name">{member.name}</h3>
-        <p className="text-gray-600 member-nim">NIM: {member.studentId}</p>
+      <div className="p-4 relative">
+        <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600 member-name">{member.name}</h3>
+        <p className="text-gray-600 member-nim flex items-center text-sm mt-1">
+          <i className="fas fa-id-card text-purple-400 mr-2"></i>
+          {member.studentId}
+        </p>
+        <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-1/2 bg-purple-100 text-purple-800 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <i className="fas fa-user-graduate text-xs"></i>
+        </div>
       </div>
     </div>
   );
@@ -68,7 +75,7 @@ const ClassMembersSection = () => {
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Class Members</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">Class Members</h2>
         <div className="mb-6 flex items-center justify-between">
           <div className="relative">
             <Skeleton className="h-10 w-64" />
@@ -86,7 +93,7 @@ const ClassMembersSection = () => {
   if (isError || !allMembers) {
     return (
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Class Members</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">Class Members</h2>
         <div className="bg-red-100 p-4 rounded-md text-red-800">
           Failed to load class members. Please try again later.
         </div>
@@ -96,81 +103,116 @@ const ClassMembersSection = () => {
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Class Members</h2>
+      <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600 mb-8 flex items-center">
+        <span className="mr-3">Class Members</span>
+        <div className="h-1 flex-grow bg-gradient-to-r from-purple-400 to-indigo-400 rounded opacity-70"></div>
+      </h2>
       
-      <div className="mb-6 flex items-center justify-between">
-        <div className="relative">
+      <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-auto">
           <input 
             type="text" 
             placeholder="Search members..." 
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            className="w-full sm:w-64 pl-12 pr-4 py-3 border border-purple-100 rounded-full focus:ring-2 focus:ring-purple-400 focus:border-purple-300 outline-none shadow-sm transition-all duration-300 focus:shadow-purple-300/30"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-purple-100 text-purple-700 w-7 h-7 rounded-full flex items-center justify-center">
+            <i className="fas fa-search text-sm"></i>
+          </div>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex gap-3 bg-purple-50 p-1.5 rounded-full shadow-inner">
           <button 
-            className={`px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium ${isGridView ? 'bg-purple-100 text-purple-700 border-purple-300' : 'bg-white'}`}
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center ${
+              isGridView 
+                ? 'bg-white text-purple-700 shadow-sm' 
+                : 'text-purple-600 hover:bg-white/50'
+            }`}
             onClick={() => setIsGridView(true)}
           >
-            Grid View
+            <i className="fas fa-th-large mr-2"></i>
+            Grid
           </button>
           <button 
-            className={`px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium ${!isGridView ? 'bg-purple-100 text-purple-700 border-purple-300' : 'bg-white'}`}
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center ${
+              !isGridView 
+                ? 'bg-white text-purple-700 shadow-sm' 
+                : 'text-purple-600 hover:bg-white/50'
+            }`}
             onClick={() => setIsGridView(false)}
           >
-            List View
+            <i className="fas fa-list mr-2"></i>
+            List
           </button>
         </div>
       </div>
       
       {isGridView ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {visibleMembers?.map(member => (
-            <MemberCard key={member.id} member={member} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {visibleMembers?.map((member, index) => (
+            <div 
+              key={member.id} 
+              className="transform transition-all duration-500"
+              style={{ 
+                animationDelay: `${index * 0.05}s`,
+                transitionDelay: `${index * 0.03}s`
+              }}
+            >
+              <MemberCard member={member} />
+            </div>
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {visibleMembers?.map(member => (
-                <tr key={member.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img 
-                      src={member.photoUrl} 
-                      alt={member.name} 
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {member.studentId}
-                  </td>
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-purple-50">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gradient-to-r from-purple-50 to-purple-100/60">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider">Photo</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider">Student ID</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-purple-50">
+                {visibleMembers?.map((member, index) => (
+                  <tr 
+                    key={member.id} 
+                    className="hover:bg-purple-50/50 transition-colors duration-150"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-100 shadow-sm">
+                        <img 
+                          src={member.photoUrl} 
+                          alt={member.name} 
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600">{member.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <i className="fas fa-id-card text-purple-400 mr-2 text-xs"></i>
+                        <span className="text-sm text-gray-600">{member.studentId}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
       
       {!showAllMembers && allMembers.length > 6 && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <button 
-            className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-full hover:shadow-lg hover:shadow-purple-500/30 font-medium transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
             onClick={() => setShowAllMembers(true)}
           >
+            <i className="fas fa-users mr-2"></i>
             View All Members
           </button>
         </div>
