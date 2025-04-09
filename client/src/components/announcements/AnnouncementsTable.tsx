@@ -44,7 +44,7 @@ const AnnouncementsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   
-  const { data: announcements, isLoading, isError } = useQuery({
+  const { data: announcements, isLoading, isError } = useQuery<Announcement[]>({
     queryKey: ['/api/announcements'],
   });
 
@@ -107,8 +107,8 @@ const AnnouncementsTable = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="flex mb-4 border-b">
-        <button className="py-3 px-6 font-medium text-purple-700 border-b-2 border-purple-600">Announcements</button>
-        <button className="py-3 px-6 font-medium text-gray-500 hover:text-purple-600">Schedule</button>
+        <button className="py-3 px-6 font-medium text-purple-700 border-b-2 border-purple-600 transition-all hover:bg-purple-50">Announcements</button>
+        <button className="py-3 px-6 font-medium text-gray-500 hover:text-purple-600 transition-all hover:bg-purple-50">Schedule</button>
       </div>
       
       <div className="overflow-x-auto p-4">
@@ -155,18 +155,18 @@ const AnnouncementsTable = () => {
       <div className="px-4 py-3 flex items-center justify-between border-t">
         <div className="flex-1 flex justify-between sm:hidden">
           <button 
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            Previous
+            <i className="fas fa-chevron-left mr-1 text-xs"></i> Previous
           </button>
           <button 
-            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            Next
+            Next <i className="fas fa-chevron-right ml-1 text-xs"></i>
           </button>
         </div>
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
@@ -180,9 +180,9 @@ const AnnouncementsTable = () => {
             </p>
           </div>
           <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <nav className="relative z-0 inline-flex space-x-2" aria-label="Pagination">
               <button 
-                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                className="relative inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
@@ -193,9 +193,9 @@ const AnnouncementsTable = () => {
               {[...Array(totalPages)].map((_, i) => (
                 <button 
                   key={i}
-                  className={`relative inline-flex items-center px-4 py-2 border ${
+                  className={`relative inline-flex items-center justify-center w-9 h-9 rounded-full border transition-colors ${
                     currentPage === i + 1
-                      ? 'bg-purple-50 text-purple-600 border-purple-300'
+                      ? 'bg-purple-100 text-purple-700 border-purple-300 shadow'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   } text-sm font-medium`}
                   onClick={() => handlePageChange(i + 1)}
@@ -205,7 +205,7 @@ const AnnouncementsTable = () => {
               ))}
               
               <button 
-                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                className="relative inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
