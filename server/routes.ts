@@ -182,11 +182,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post(`${apiPrefix}/announcements`, requireAdmin, async (req, res) => {
+  app.post(`${apiPrefix}/announcements`, async (req, res) => {
     try {
       const validatedAnnouncement = insertAnnouncementSchema.parse(req.body);
       const announcement = await dataStorage.createAnnouncement(validatedAnnouncement);
       res.status(201).json(announcement);
+    } catch (error) {
+      const { status, message } = handleZodError(error);
+      res.status(status).json({ message });
+    }
+  });
+
+  app.delete(`${apiPrefix}/announcements/all`, async (req, res) => {
+    try {
+      await dataStorage.deleteAllAnnouncements();
+      res.status(204).end();
     } catch (error) {
       const { status, message } = handleZodError(error);
       res.status(status).json({ message });

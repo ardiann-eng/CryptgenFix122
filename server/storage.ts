@@ -156,6 +156,11 @@ export class MemStorage implements IStorage {
     return this.announcements.delete(id);
   }
   
+  async deleteAllAnnouncements(): Promise<void> {
+    this.announcements.clear();
+    this.currentAnnouncementId = 1;
+  }
+  
   // Transaction methods
   async getAllTransactions(): Promise<Transaction[]> {
     return Array.from(this.transactions.values());
