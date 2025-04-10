@@ -168,6 +168,9 @@ const MemberCard = ({ member }: { member: ClassMember }) => {
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Update profile photo</DialogTitle>
+                <p className="text-sm text-gray-500 mt-1">
+                  Unggah foto profil baru untuk menampilkan di kartu anggota Anda.
+                </p>
               </DialogHeader>
               <PhotoUploader member={member} onSuccess={handleUploadSuccess} />
             </DialogContent>

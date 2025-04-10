@@ -43,6 +43,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     cb(null, true);
   };
   
+
+  
   const upload = multer({ 
     storage: fileStorage,
     fileFilter: fileFilter,
@@ -136,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Photo upload endpoint for members
-  app.post(`${apiPrefix}/members/:id/photo`, upload.single('photo'), async (req, res) => {
+  app.post(`${apiPrefix}/members/:id/photo`, upload.single('photo'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: req.fileValidationError || "Please upload a valid image file" });
