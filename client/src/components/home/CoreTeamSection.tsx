@@ -266,7 +266,7 @@ const CoreTeamSection = () => {
   return (
     <section className="mb-12">
       <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600 mb-8 flex items-center">
-        <span className="mr-3 animate-pulse-subtle">Core Team Members</span>
+        <span className="mr-3">Core Team Members</span>
         <div className="h-1 flex-grow bg-gradient-to-r from-purple-400 to-indigo-400 rounded opacity-70"></div>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
