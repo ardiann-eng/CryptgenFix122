@@ -34,8 +34,8 @@ const HeroSection = () => {
       {/* Background with parallax effect */}
       <div className="absolute inset-0 overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1400&q=80"
-          alt="Modern Classroom"
+          src="/images/cryptgen-background.jpeg"
+          alt="CryptGen Background"
           className="w-full h-full object-cover filter brightness-[0.85] transform scale-110 motion-safe:animate-slow-zoom"
         />
       </div>

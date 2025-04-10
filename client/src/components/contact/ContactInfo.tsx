@@ -39,16 +39,6 @@ const ContactInfo = () => {
                 <p className="text-gray-600">0895393712762</p>
               </div>
             </div>
-            
-            <div className="flex items-start">
-              <div className="p-2 bg-purple-100 rounded-md mr-4">
-                <i className="fas fa-clock text-purple-600"></i>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-700">Office Hours</h4>
-                <p className="text-gray-600">Monday-Friday: 9AM - 4PM</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
