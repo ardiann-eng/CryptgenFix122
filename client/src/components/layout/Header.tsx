@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import cryptgenLogo from '../../assets/cryptgen-logo.png';
 
 interface HeaderProps {
   currentPath: string;
@@ -78,10 +79,14 @@ const Header = ({ currentPath }: HeaderProps) => {
         <div className="flex items-center">
           <Link href="/">
             <div className="flex items-center cursor-pointer group">
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-white to-purple-100 flex items-center justify-center text-transparent bg-clip-text bg-gradient-to-br from-purple-700 to-purple-500 font-bold mr-3 shadow-md transition-all group-hover:shadow-purple-300/30 ${
-                scrolled ? 'scale-90' : 'scale-100'
+              <div className={`flex items-center justify-center mr-3 transition-all ${
+                scrolled ? 'w-8 h-8' : 'w-10 h-10'
               }`}>
-                CG
+                <img 
+                  src={cryptgenLogo} 
+                  alt="Cryptgen Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <h1 className={`font-bold transition-all bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 ${
                 scrolled ? 'text-xl' : 'text-2xl'
@@ -124,6 +129,14 @@ const Header = ({ currentPath }: HeaderProps) => {
           : 'opacity-0 pointer-events-none'
       }`}>
         <div className="flex flex-col h-full px-6 py-24 items-center justify-center space-y-6">
+          <div className="flex items-center mb-6">
+            <img 
+              src={cryptgenLogo} 
+              alt="Cryptgen Logo" 
+              className="w-16 h-16 mr-3"
+            />
+            <span className="text-3xl font-bold text-white">CryptGen</span>
+          </div>
           {navLinks.map((link) => (
             <Link key={link.path} href={link.path}>
               <div 
