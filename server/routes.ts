@@ -237,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post(`${apiPrefix}/transactions`, requireAdmin, async (req, res) => {
+  app.post(`${apiPrefix}/transactions`, async (req, res) => {
     try {
       const validatedTransaction = insertTransactionSchema.parse(req.body);
       const transaction = await dataStorage.createTransaction(validatedTransaction);
@@ -248,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put(`${apiPrefix}/transactions/:id`, requireAdmin, async (req, res) => {
+  app.put(`${apiPrefix}/transactions/:id`, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedTransaction = insertTransactionSchema.partial().parse(req.body);
@@ -265,7 +265,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete(`${apiPrefix}/transactions/:id`, requireAdmin, async (req, res) => {
+  app.delete(`${apiPrefix}/transactions/:id`, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await dataStorage.deleteTransaction(id);
