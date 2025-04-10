@@ -71,7 +71,7 @@ const AnnouncementModal = ({ isOpen, onClose, announcementToEdit }: Announcement
         date: new Date().toISOString(),
         postedBy: 'Admin',
       };
-      return apiRequest('/api/announcements', 'POST', requestData);
+      return apiRequest('POST', '/api/announcements', requestData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/announcements'] });
@@ -92,10 +92,7 @@ const AnnouncementModal = ({ isOpen, onClose, announcementToEdit }: Announcement
 
   const updateMutation = useMutation({
     mutationFn: async (data: AnnouncementFormData) => {
-      return apiRequest(`/api/announcements/${announcementToEdit?.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('PUT', `/api/announcements/${announcementToEdit?.id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/announcements'] });
