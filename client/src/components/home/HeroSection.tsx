@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import cryptgenBackground from '../../assets/cryptgen-background.jpeg';
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -34,7 +35,7 @@ const HeroSection = () => {
       {/* Background with parallax effect */}
       <div className="absolute inset-0 overflow-hidden">
         <img
-          src="/images/cryptgen-background.jpeg"
+          src={cryptgenBackground}
           alt="CryptGen Background"
           className="w-full h-full object-cover filter brightness-[0.85] transform scale-110 motion-safe:animate-slow-zoom"
         />
