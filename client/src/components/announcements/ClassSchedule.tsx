@@ -85,7 +85,34 @@ const ClassSchedule = () => {
   // Update the schedule grid with new item
   const updateScheduleGrid = (items: ScheduleItem[]) => {
     // Start with a clean grid
-    const newGrid = createEmptyScheduleGrid();
+    let newGrid = createEmptyScheduleGrid();
+    
+    // Get all unique time slots from items
+    const allTimeSlots = [...new Set(items.map(item => item.time))];
+    
+    // If we have custom time slots not in the default grid, create a new grid with all time slots
+    const customTimeSlots = allTimeSlots.filter(
+      time => !newGrid.some(row => row.time === time)
+    );
+    
+    if (customTimeSlots.length > 0) {
+      // Get unique set of all time slots (default plus custom)
+      const allUniqueTimeSlots = [...new Set([
+        ...newGrid.map(row => row.time),
+        ...customTimeSlots
+      ])].sort(); // Sort times chronologically
+      
+      // Create a completely new grid with all time slots
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      newGrid = allUniqueTimeSlots.map(time => {
+        const row: any = { time };
+        days.forEach(day => {
+          const lowerDay = day.toLowerCase();
+          row[lowerDay] = { title: null, room: null, color: null };
+        });
+        return row;
+      });
+    }
     
     // Update grid cells with schedule items
     items.forEach(item => {
@@ -101,6 +128,19 @@ const ClassSchedule = () => {
           room: room, 
           color: color 
         };
+      } else {
+        // If we somehow don't have this time slot (should not happen), add a new row
+        const newRow: any = { time };
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        days.forEach(d => {
+          const lowerD = d.toLowerCase();
+          newRow[lowerD] = { title: null, room: null, color: null };
+        });
+        newRow[dayLower] = { title: course, room: room, color: color };
+        newGrid.push(newRow);
+        
+        // Sort the grid by time
+        newGrid.sort((a, b) => a.time.localeCompare(b.time));
       }
     });
     
