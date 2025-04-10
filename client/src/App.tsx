@@ -9,24 +9,10 @@ import Announcements from "./pages/Announcements";
 import Finance from "./pages/Finance";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/not-found";
-import AuthPage from "./pages/auth-page";
-import { AuthProvider } from "@/hooks/use-auth";
-import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   const [location] = useLocation();
   
-  // Exclude header and footer from auth page
-  const isAuthPage = location === "/auth";
-
-  if (isAuthPage) {
-    return (
-      <Switch>
-        <Route path="/auth" component={AuthPage} />
-      </Switch>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header currentPath={location} />
@@ -35,9 +21,8 @@ function Router() {
           <Switch>
             <Route path="/" component={Home} />
             <Route path="/announcements" component={Announcements} />
-            <ProtectedRoute path="/finance" component={Finance} />
+            <Route path="/finance" component={Finance} />
             <Route path="/contact" component={Contact} />
-            <Route path="/auth" component={AuthPage} />
             <Route component={NotFound} />
           </Switch>
         </div>
@@ -50,10 +35,8 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
+      <Router />
+      <Toaster />
     </QueryClientProvider>
   );
 }
