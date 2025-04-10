@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useRef } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from '@/hooks/use-toast';
 
 interface ClassMember {
   id: number;
@@ -10,7 +13,143 @@ interface ClassMember {
   photoUrl: string;
 }
 
+const PhotoUploader = ({ member, onSuccess }: { member: ClassMember, onSuccess: () => void }) => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "File type not supported",
+        description: "Please select an image file",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const handleUpload = async () => {
+    if (!fileInputRef.current?.files?.length) {
+      toast({
+        title: "No file selected",
+        description: "Please select an image to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const file = fileInputRef.current.files[0];
+    const formData = new FormData();
+    formData.append('photo', file);
+    
+    setIsUploading(true);
+    
+    try {
+      const response = await fetch(`/api/members/${member.id}/photo`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload photo');
+      }
+      
+      toast({
+        title: "Photo updated successfully",
+        description: "Your photo has been updated",
+        variant: "default"
+      });
+      
+      onSuccess();
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "An error occurred while uploading the photo",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+      setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+  
+  return (
+    <div className="p-4">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-purple-100 shadow-md mb-2">
+          <img 
+            src={preview || member.photoUrl} 
+            alt={member.name} 
+            className="h-full w-full object-cover"
+          />
+        </div>
+        
+        <div className="space-y-4 w-full">
+          <div className="flex justify-center">
+            <label className="cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 font-medium py-2 px-4 rounded-full transition-colors">
+              <input 
+                type="file" 
+                className="hidden" 
+                accept="image/*" 
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
+              <i className="fas fa-image mr-2"></i>
+              Select photo
+            </label>
+          </div>
+          
+          {preview && (
+            <Button 
+              className="w-full"
+              onClick={handleUpload}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-upload mr-2"></i>
+                  Upload photo
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MemberCard = ({ member }: { member: ClassMember }) => {
+  const [openPhotoDialog, setOpenPhotoDialog] = useState(false);
+  const queryClient = useQueryClient();
+  
+  const handleUploadSuccess = () => {
+    // Refresh the members data
+    queryClient.invalidateQueries({ queryKey: ['/api/members'] });
+    setOpenPhotoDialog(false);
+  };
+  
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden member-card group hover:shadow-lg transition-all duration-300 border border-purple-50">
       <div className="h-40 overflow-hidden relative">
@@ -19,7 +158,21 @@ const MemberCard = ({ member }: { member: ClassMember }) => {
           alt={`${member.name}`} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <Dialog open={openPhotoDialog} onOpenChange={setOpenPhotoDialog}>
+            <DialogTrigger asChild>
+              <button className="bg-white/90 text-purple-700 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity transform hover:scale-110 hover:bg-white">
+                <i className="fas fa-camera"></i>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Update profile photo</DialogTitle>
+              </DialogHeader>
+              <PhotoUploader member={member} onSuccess={handleUploadSuccess} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       <div className="p-4 relative">
         <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600 member-name">{member.name}</h3>

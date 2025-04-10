@@ -39,7 +39,7 @@ const CoreMemberCard = ({ member }: { member: CoreTeamMember }) => {
             <i className="fas fa-graduation-cap"></i>
           </div>
         </div>
-        <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-purple-800 to-indigo-600 mb-3">{member.name}</h3>
+        <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-indigo-600 mb-3">{member.name}</h3>
         <p className="text-gray-600 mb-4 flex items-center">
           <i className="fas fa-id-card mr-2 text-purple-400"></i>
           <span>{member.studentId}</span>
