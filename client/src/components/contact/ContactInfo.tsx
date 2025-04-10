@@ -26,7 +26,7 @@ const ContactInfo = () => {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-700">Email</h4>
-                <p className="text-gray-600">cryptgen.class@university.edu</p>
+                <p className="text-gray-600">cryptgen23@gmail.com</p>
               </div>
             </div>
             
@@ -36,7 +36,7 @@ const ContactInfo = () => {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-700">Phone</h4>
-                <p className="text-gray-600">+62 123 4567 890</p>
+                <p className="text-gray-600">0895393712762</p>
               </div>
             </div>
             
@@ -60,18 +60,13 @@ const ContactInfo = () => {
         
         <div className="p-6">
           <div className="flex space-x-4">
-            <a href="#" className="p-2 bg-blue-100 rounded-full text-blue-600 hover:bg-blue-200">
-              <i className="fab fa-facebook-f"></i>
-            </a>
-            <a href="#" className="p-2 bg-pink-100 rounded-full text-pink-600 hover:bg-pink-200">
+            <a href="https://instagram.com/cryptgen.23" target="_blank" rel="noopener noreferrer" className="p-2 bg-pink-100 rounded-full text-pink-600 hover:bg-pink-200">
               <i className="fab fa-instagram"></i>
             </a>
-            <a href="#" className="p-2 bg-blue-100 rounded-full text-blue-400 hover:bg-blue-200">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="#" className="p-2 bg-red-100 rounded-full text-red-600 hover:bg-red-200">
-              <i className="fab fa-youtube"></i>
-            </a>
+          </div>
+          
+          <div className="mt-4">
+            <p className="text-sm text-gray-600">Follow us on Instagram: <a href="https://instagram.com/cryptgen.23" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">@cryptgen.23</a></p>
           </div>
         </div>
       </div>
