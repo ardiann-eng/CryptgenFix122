@@ -1,31 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const scheduleData = [
-  {
-    time: '08:00 - 10:00',
-    monday: { title: 'Cryptography Basics', room: 'Room 301', color: 'purple' },
-    tuesday: { title: 'Data Structures', room: 'Room 205', color: 'blue' },
-    wednesday: { title: null, room: null, color: null },
-    thursday: { title: 'Web Security', room: 'Room 102', color: 'green' },
-    friday: { title: null, room: null, color: null },
-  },
-  {
-    time: '10:15 - 12:15',
-    monday: { title: null, room: null, color: null },
-    tuesday: { title: 'Algorithms', room: 'Room 205', color: 'yellow' },
-    wednesday: { title: 'Cryptography Lab', room: 'Room 301', color: 'purple' },
-    thursday: { title: null, room: null, color: null },
-    friday: { title: 'Ethics in Computing', room: 'Room 102', color: 'pink' },
-  },
-  {
-    time: '13:00 - 15:00',
-    monday: { title: 'Network Security', room: 'Room 301', color: 'orange' },
-    tuesday: { title: null, room: null, color: null },
-    wednesday: { title: 'Database Systems', room: 'Room 205', color: 'indigo' },
-    thursday: { title: 'Advanced Cryptography', room: 'Room 301', color: 'red' },
-    friday: { title: null, room: null, color: null },
-  },
-];
+interface ScheduleItem {
+  day: string;
+  time: string;
+  course: string;
+  room: string;
+  color: string;
+}
+
+// Create a grid structure with time slots and days
+const createEmptyScheduleGrid = () => {
+  const timeSlots = ['08:00 - 10:00', '10:15 - 12:15', '13:00 - 15:00', '15:15 - 17:15'];
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  
+  return timeSlots.map(time => {
+    const row: any = { time };
+    days.forEach(day => {
+      const lowerDay = day.toLowerCase();
+      row[lowerDay] = { title: null, room: null, color: null };
+    });
+    return row;
+  });
+};
+
+// Initial empty schedule data
+const emptyScheduleData = createEmptyScheduleGrid();
 
 const getColorClasses = (color: string | null) => {
   if (!color) return 'bg-gray-100 text-gray-800';
@@ -78,7 +77,92 @@ const getDayColor = (color: string | null) => {
 };
 
 const ClassSchedule = () => {
-  const [currentMonth, setCurrentMonth] = React.useState('October 2023');
+  const [currentMonth, setCurrentMonth] = useState('April 2025');
+  const [scheduleData, setScheduleData] = useState(emptyScheduleData);
+  const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
+  
+  // Update the schedule grid with new item
+  const updateScheduleGrid = (items: ScheduleItem[]) => {
+    // Start with a clean grid
+    const newGrid = createEmptyScheduleGrid();
+    
+    // Update grid cells with schedule items
+    items.forEach(item => {
+      const { day, time, course, room, color } = item;
+      const dayLower = day.toLowerCase();
+      
+      // Find the row for this time slot
+      const rowIndex = newGrid.findIndex(row => row.time === time);
+      if (rowIndex >= 0) {
+        // Update the cell with course info
+        newGrid[rowIndex][dayLower] = { 
+          title: course, 
+          room: room, 
+          color: color 
+        };
+      }
+    });
+    
+    setScheduleData(newGrid);
+  };
+  
+  // Effect to run when component mounts - load any saved schedule items
+  useEffect(() => {
+    // For demo, we'll create some example items
+    const exampleItems: ScheduleItem[] = [
+      {
+        day: 'Monday',
+        time: '08:00 - 10:00',
+        course: 'Cryptography Basics',
+        room: 'Room 301',
+        color: 'purple'
+      },
+      {
+        day: 'Tuesday',
+        time: '08:00 - 10:00',
+        course: 'Data Structures',
+        room: 'Room 205',
+        color: 'blue'
+      },
+      {
+        day: 'Thursday',
+        time: '08:00 - 10:00',
+        course: 'Web Security',
+        room: 'Room 102',
+        color: 'green'
+      }
+    ];
+    
+    setScheduleItems(exampleItems);
+    updateScheduleGrid(exampleItems);
+    
+    // In a real app, you would fetch from API here
+    // const fetchSchedule = async () => {
+    //   try {
+    //     const response = await fetch('/api/schedule');
+    //     const data = await response.json();
+    //     setScheduleItems(data);
+    //     updateScheduleGrid(data);
+    //   } catch (error) {
+    //     console.error('Error fetching schedule:', error);
+    //   }
+    // };
+    // fetchSchedule();
+  }, []);
+  
+  // Function to add a new schedule item - will be called from parent
+  (window as any).addScheduleItem = (item: ScheduleItem) => {
+    const newItems = [...scheduleItems, item];
+    setScheduleItems(newItems);
+    updateScheduleGrid(newItems);
+    return true; // Indicate success
+  };
+  
+  // Function to clear all schedule items
+  const clearSchedule = () => {
+    setScheduleItems([]);
+    setScheduleData(createEmptyScheduleGrid());
+  };
   
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -87,11 +171,11 @@ const ClassSchedule = () => {
           <h3 className="text-lg font-semibold text-gray-800">{currentMonth}</h3>
         </div>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-lg hover:bg-gray-100">
-            <i className="fas fa-chevron-left text-gray-500"></i>
-          </button>
-          <button className="p-2 rounded-lg hover:bg-gray-100">
-            <i className="fas fa-chevron-right text-gray-500"></i>
+          <button 
+            className="px-4 py-2 bg-red-600 text-white text-sm rounded-full hover:bg-red-700"
+            onClick={clearSchedule}
+          >
+            <i className="fas fa-trash mr-2"></i> Clear Schedule
           </button>
         </div>
       </div>

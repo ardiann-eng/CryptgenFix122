@@ -34,6 +34,7 @@ export interface IStorage {
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
   updateAnnouncement(id: number, announcement: Partial<InsertAnnouncement>): Promise<Announcement | undefined>;
   deleteAnnouncement(id: number): Promise<boolean>;
+  deleteAllAnnouncements(): Promise<void>;
   
   // Transactions
   getAllTransactions(): Promise<Transaction[]>;

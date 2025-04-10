@@ -19,6 +19,20 @@ const Announcements = () => {
   const handleAddSchedule = () => {
     setIsScheduleModalOpen(true);
   };
+  
+  const handleDeleteAllAnnouncements = async () => {
+    if (confirm('Are you sure you want to delete all announcements? This action cannot be undone.')) {
+      try {
+        await fetch('/api/announcements/all', {
+          method: 'DELETE',
+        });
+        // Refresh the page to show the changes
+        window.location.reload();
+      } catch (error) {
+        console.error('Error deleting announcements:', error);
+      }
+    }
+  };
 
   const handleEditAnnouncement = (announcement: Announcement) => {
     setAnnouncementToEdit(announcement);
@@ -26,9 +40,30 @@ const Announcements = () => {
   };
 
   const handleSaveSchedule = (data: any) => {
-    // Save schedule data (this would typically interact with an API)
-    // For now, we're just logging the data
-    console.log('Schedule data:', data);
+    // Add schedule item to the grid via the global function
+    if ((window as any).addScheduleItem) {
+      (window as any).addScheduleItem({
+        day: data.day,
+        time: data.time,
+        course: data.course,
+        room: data.room,
+        color: data.color
+      });
+      
+      // Show success message
+      toast({
+        title: "Schedule Added",
+        description: "The class has been added to the schedule.",
+      });
+    } else {
+      // Fallback if the function isn't available
+      console.log('Schedule data:', data);
+      toast({
+        title: "Schedule Not Saved",
+        description: "There was an issue adding the class to the schedule.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -42,6 +77,12 @@ const Announcements = () => {
               onClick={handleAddAnnouncement}
             >
               <i className="fas fa-plus mr-2"></i> Add New
+            </button>
+            <button 
+              className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 font-medium flex items-center shadow-md transition-all hover:shadow-lg"
+              onClick={handleDeleteAllAnnouncements}
+            >
+              <i className="fas fa-trash mr-2"></i> Delete All
             </button>
             <div className="relative">
               <input 
