@@ -39,10 +39,60 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
       expenseBreakdownChartInstance.current.destroy();
     }
 
-    // Prepare data for Income vs Expense Chart
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    const incomeData = [500000, 750000, 650000, 800000, 950000, 1100000];
-    const expenseData = [300000, 450000, 400000, 350000, 500000, 550000];
+    // Process transactions to get monthly data
+    const processTransactionsByMonth = () => {
+      // Current date info
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+      
+      // Get last 6 months (including current month)
+      const monthLabels = [];
+      const monthlyIncome = Array(6).fill(0);
+      const monthlyExpense = Array(6).fill(0);
+      
+      // Create labels for last 6 months
+      for (let i = 5; i >= 0; i--) {
+        const month = new Date(currentYear, currentMonth - i, 1);
+        const monthName = month.toLocaleString('default', { month: 'short' });
+        monthLabels.unshift(monthName); // Add to beginning of array
+      }
+      
+      // Process transactions
+      transactions.forEach(transaction => {
+        const transactionDate = new Date(transaction.date);
+        const transactionMonth = transactionDate.getMonth();
+        const transactionYear = transactionDate.getFullYear();
+        
+        // Check if transaction is within last 6 months
+        const monthDiff = (currentYear - transactionYear) * 12 + (currentMonth - transactionMonth);
+        if (monthDiff >= 0 && monthDiff < 6) {
+          const monthIndex = 5 - monthDiff; // Get correct index in our arrays
+          
+          // Add to appropriate array based on transaction type
+          if (transaction.type === 'income') {
+            monthlyIncome[monthIndex] += Number(transaction.amount);
+          } else {
+            monthlyExpense[monthIndex] += Number(transaction.amount);
+          }
+        }
+      });
+      
+      return {
+        labels: monthLabels,
+        income: monthlyIncome,
+        expense: monthlyExpense
+      };
+    };
+    
+    // Get actual transaction data by month
+    const { labels: months, income: incomeData, expense: expenseData } = processTransactionsByMonth();
+    
+    // If there's no transaction data, use financial summary for current month
+    if (financeSummary && incomeData.every(amount => amount === 0) && expenseData.every(amount => amount === 0)) {
+      incomeData[incomeData.length - 1] = financeSummary.totalIncome;
+      expenseData[expenseData.length - 1] = financeSummary.totalExpense;
+    }
     
     // Calculate balance data (income - expense)
     const balanceData = incomeData.map((income, index) => income - expenseData[index]);
@@ -115,14 +165,61 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
       }
     }
 
-    // Prepare data for Expense Breakdown Chart
-    const categories = ['Supplies', 'Events', 'Printing', 'Travel', 'Other'];
-    const expenseBreakdownData = [35, 25, 20, 15, 5];
+    // Process transactions for expense breakdown by category
+    const getExpenseBreakdown = (): { categories: string[], data: number[] } => {
+      // Define possible expense categories
+      const categories = ['supplies', 'events', 'printing', 'travel', 'dues', 'other'];
+      const categoryLabels = ['Supplies', 'Events', 'Printing', 'Travel', 'Dues', 'Other'];
+      const categoryAmounts = Array(categories.length).fill(0);
+      
+      // Calculate the total for each category
+      transactions.forEach(transaction => {
+        if (transaction.type === 'expense') {
+          const categoryIndex = categories.indexOf(transaction.category.toLowerCase());
+          if (categoryIndex !== -1) {
+            categoryAmounts[categoryIndex] += Number(transaction.amount);
+          } else {
+            // If category not found, add to "Other"
+            categoryAmounts[categories.length - 1] += Number(transaction.amount);
+          }
+        }
+      });
+      
+      // Filter out categories with zero amounts
+      const nonZeroCategories: string[] = [];
+      const nonZeroAmounts: number[] = [];
+      
+      categoryAmounts.forEach((amount, index) => {
+        if (amount > 0) {
+          nonZeroCategories.push(categoryLabels[index]);
+          nonZeroAmounts.push(amount);
+        }
+      });
+      
+      // If there are no expenses, show default categories
+      if (nonZeroCategories.length === 0) {
+        return {
+          categories: categoryLabels,
+          data: categoryAmounts.map(() => 0) // All zeros
+        };
+      }
+      
+      return {
+        categories: nonZeroCategories,
+        data: nonZeroAmounts
+      };
+    };
+    
+    // Get expense breakdown data
+    const { categories, data: expenseBreakdownData } = getExpenseBreakdown();
+    
+    // Define colors for categories
     const expenseColors = [
       '#a855f7', // Purple
       '#ec4899', // Pink
       '#f59e0b', // Amber
       '#10b981', // Emerald
+      '#3b82f6', // Blue
       '#6b7280'  // Gray
     ];
 
@@ -146,6 +243,14 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
             plugins: {
               legend: {
                 position: 'bottom',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const value = context.raw as number;
+                    return context.label + ': Rp ' + value.toLocaleString();
+                  }
+                }
               }
             }
           }
