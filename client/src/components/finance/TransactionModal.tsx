@@ -18,12 +18,12 @@ const getCurrentDate = () => {
 const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<Partial<InsertTransaction>>({
+  const [formData, setFormData] = useState<Partial<InsertTransaction> & { amount: string | number }>({
     type: 'income',
     date: getCurrentDate(),
     description: '',
     category: '',
-    amount: 0,
+    amount: '',
     notes: '',
     status: 'completed'
   });
@@ -35,7 +35,7 @@ const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionMod
         date: new Date(transactionToEdit.date).toISOString().split('T')[0],
         description: transactionToEdit.description,
         category: transactionToEdit.category,
-        amount: Number(transactionToEdit.amount),
+        amount: String(transactionToEdit.amount),
         notes: transactionToEdit.notes || '',
         status: transactionToEdit.status
       });
@@ -45,7 +45,7 @@ const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionMod
         date: getCurrentDate(),
         description: '',
         category: '',
-        amount: 0,
+        amount: '',
         notes: '',
         status: 'completed'
       });
@@ -98,10 +98,19 @@ const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionMod
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
-    }));
+    
+    if (name === 'amount') {
+      // Handle amount field specially to convert to string for API
+      setFormData(prev => ({
+        ...prev,
+        [name]: value === '' ? '' : value
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,7 +121,7 @@ const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionMod
   };
 
   const handleSubmit = () => {
-    if (!formData.description || !formData.category || !formData.amount) {
+    if (!formData.description || !formData.category || formData.amount === '' || formData.amount === undefined) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -121,13 +130,20 @@ const TransactionModal = ({ isOpen, onClose, transactionToEdit }: TransactionMod
       return;
     }
 
+    // Process the data before sending to API
+    const processedData = {
+      ...formData,
+      // Ensure amount is properly formatted as string for the API
+      amount: String(formData.amount)
+    };
+
     if (transactionToEdit) {
       updateTransactionMutation.mutate({ 
         id: transactionToEdit.id, 
-        data: formData as Partial<InsertTransaction>
+        data: processedData as Partial<InsertTransaction>
       });
     } else {
-      createTransactionMutation.mutate(formData as InsertTransaction);
+      createTransactionMutation.mutate(processedData as InsertTransaction);
     }
   };
 
