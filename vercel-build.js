@@ -1,4 +1,3 @@
-
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -16,19 +15,7 @@ try {
 
   // Build backend
   console.log('Building backend...');
-  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist', { stdio: 'inherit' });
-
-  // Copy static files
-  console.log('Copying static files...');
-  if (fs.existsSync('./public')) {
-    const publicFiles = fs.readdirSync('./public');
-    publicFiles.forEach(file => {
-      fs.copyFileSync(
-        path.join('./public', file),
-        path.join('./dist', file)
-      );
-    });
-  }
+  execSync('npx tsc --project tsconfig.json', { stdio: 'inherit' });
 
   console.log('Build completed successfully!');
 } catch (error) {
