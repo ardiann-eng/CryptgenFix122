@@ -16,7 +16,7 @@ const ContactInfo = () => {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-700">Location</h4>
-                <p className="text-gray-600">Faculty of Computer Science, Building A, Room 305</p>
+                <p className="text-gray-600">Fakultas Ilmu pendidikan Jl. Pendidikan I No.27, Tidung, Kec. Rappocini, Kota Makassar, Sulawesi Selatan 90222</p>
               </div>
             </div>
             

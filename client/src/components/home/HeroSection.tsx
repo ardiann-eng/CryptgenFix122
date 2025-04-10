@@ -20,6 +20,14 @@ const HeroSection = () => {
     
     return () => clearInterval(interval);
   }, []);
+  
+  // Function to scroll to Core Team section
+  const scrollToTeamSection = () => {
+    const teamSection = document.getElementById('core-team-section');
+    if (teamSection) {
+      teamSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="relative rounded-2xl overflow-hidden h-[70vh] max-h-[600px] min-h-[450px] mb-12 shadow-xl">
@@ -60,14 +68,22 @@ const HeroSection = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-full shadow-lg hover:shadow-purple-500/30 transition duration-300 transform hover:-translate-y-1 active:scale-95">
+              <button 
+                onClick={scrollToTeamSection}
+                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-full shadow-lg hover:shadow-purple-500/30 transition duration-300 transform hover:-translate-y-1 active:scale-95"
+              >
                 <i className="fas fa-graduation-cap mr-2"></i>
                 Explore Classes
               </button>
-              <button className="px-8 py-4 bg-transparent border-2 border-purple-300/50 text-white font-medium rounded-full hover:bg-white/10 transition duration-300 backdrop-blur-sm active:scale-95">
-                <i className="fas fa-users mr-2"></i>
-                Join Community
-              </button>
+              <a 
+                href="https://instagram.com/cryptgen.23" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-8 py-4 bg-transparent border-2 border-purple-300/50 text-white font-medium rounded-full hover:bg-white/10 transition duration-300 backdrop-blur-sm active:scale-95 inline-flex items-center justify-center"
+              >
+                <i className="fab fa-instagram mr-2"></i>
+                See Community
+              </a>
             </div>
           </div>
         </div>
