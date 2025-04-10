@@ -39,8 +39,12 @@ const formatDate = (dateString: string) => {
   return date.toISOString().split('T')[0];
 };
 
-const AnnouncementsTable = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+interface AnnouncementsTableProps {
+  onEditAnnouncement: (announcement: Announcement) => void;
+  searchTerm?: string;
+}
+
+const AnnouncementsTable = ({ onEditAnnouncement, searchTerm = '' }: AnnouncementsTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   
@@ -139,8 +143,11 @@ const AnnouncementsTable = () => {
                 </TableCell>
                 <TableCell>{announcement.postedBy}</TableCell>
                 <TableCell className="text-right">
-                  <button className="text-purple-600 hover:text-purple-900 mr-3">
-                    <i className="fas fa-eye"></i>
+                  <button 
+                    className="text-purple-600 hover:text-purple-900 mr-3"
+                    onClick={() => onEditAnnouncement(announcement)}
+                  >
+                    <i className="fas fa-edit"></i>
                   </button>
                   <button className="text-gray-600 hover:text-gray-900">
                     <i className="fas fa-download"></i>
