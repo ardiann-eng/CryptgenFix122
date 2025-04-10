@@ -1,34 +1,37 @@
-// Script untuk proses build di Vercel
+
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Fungsi untuk menjalankan perintah shell dengan output yang ditampilkan
-function runCommand(command) {
-  console.log(`Running: ${command}`);
-  execSync(command, { stdio: 'inherit' });
+try {
+  // Ensure output directory exists
+  const outputDir = './dist';
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  // Build frontend
+  console.log('Building frontend...');
+  execSync('npx vite build', { stdio: 'inherit' });
+
+  // Build backend
+  console.log('Building backend...');
+  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist', { stdio: 'inherit' });
+
+  // Copy static files
+  console.log('Copying static files...');
+  if (fs.existsSync('./public')) {
+    const publicFiles = fs.readdirSync('./public');
+    publicFiles.forEach(file => {
+      fs.copyFileSync(
+        path.join('./public', file),
+        path.join('./dist', file)
+      );
+    });
+  }
+
+  console.log('Build completed successfully!');
+} catch (error) {
+  console.error('Build failed:', error.message);
+  process.exit(1);
 }
-
-// Direktori output
-const outputDir = './dist';
-
-// Pastikan direktori output ada
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
-}
-
-// Build frontend dengan Vite
-console.log('Building frontend...');
-runCommand('npx vite build');
-
-// Build backend dengan esbuild
-console.log('Building backend...');
-runCommand('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist');
-
-// Salin file statis ke direktori output
-console.log('Copying static files...');
-if (fs.existsSync('./client/public')) {
-  runCommand('cp -r ./client/public/* ./dist/');
-}
-
-console.log('Build completed successfully!');
