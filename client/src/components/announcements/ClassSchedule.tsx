@@ -10,10 +10,11 @@ interface ScheduleItem {
 
 // Create a grid structure with time slots and days
 const createEmptyScheduleGrid = () => {
-  const timeSlots = ['08:00 - 10:00', '10:15 - 12:15', '13:00 - 15:00', '15:15 - 17:15'];
+  // Default time slots (these can be overridden by added items)
+  const defaultTimeSlots = ['08:00 - 10:00', '10:15 - 12:15', '13:00 - 15:00', '15:15 - 17:15'];
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   
-  return timeSlots.map(time => {
+  return defaultTimeSlots.map(time => {
     const row: any = { time };
     days.forEach(day => {
       const lowerDay = day.toLowerCase();

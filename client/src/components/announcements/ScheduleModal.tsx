@@ -47,7 +47,7 @@ interface ScheduleItem {
 
 const scheduleSchema = z.object({
   day: z.string({ required_error: 'Day is required' }),
-  time: z.string({ required_error: 'Time slot is required' }),
+  time: z.string().min(5, { message: 'Time format should be like "08:00 - 10:00"' }),
   course: z.string().min(3, { message: 'Course name must be at least 3 characters' }),
   room: z.string().min(1, { message: 'Room is required' }),
   color: z.string({ required_error: 'Color is required' }),
@@ -63,12 +63,7 @@ const daysOfWeek = [
   'Friday',
 ];
 
-const timeSlots = [
-  '08:00 - 10:00',
-  '10:15 - 12:15',
-  '13:00 - 15:00',
-  '15:15 - 17:15',
-];
+// We'll replace the fixed timeSlots with a custom time input
 
 const colorOptions = [
   { label: 'Purple', value: 'purple' },
@@ -167,21 +162,12 @@ const ScheduleModal = ({ isOpen, onClose, onSave, scheduleToEdit }: ScheduleModa
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Time Slot</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {timeSlots.map((time) => (
-                          <SelectItem key={time} value={time}>{time}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g. 08:00 - 10:00" 
+                        {...field} 
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -3,9 +3,11 @@ import AnnouncementsTable from '@/components/announcements/AnnouncementsTable';
 import ClassSchedule from '@/components/announcements/ClassSchedule';
 import AnnouncementModal from '@/components/announcements/AnnouncementModal';
 import ScheduleModal from '@/components/announcements/ScheduleModal';
+import { useToast } from '@/hooks/use-toast';
 import type { Announcement } from '@shared/schema';
 
 const Announcements = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
