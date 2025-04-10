@@ -146,7 +146,7 @@ const Announcements = () => {
             <i className="fas fa-plus mr-2"></i> Add Class
           </button>
         </div>
-        <ClassSchedule />
+        <ClassSchedule onEditSchedule={handleEditSchedule} />
       </section>
 
       <AnnouncementModal 

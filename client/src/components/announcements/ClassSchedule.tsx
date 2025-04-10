@@ -8,6 +8,11 @@ interface ScheduleItem {
   color: string;
 }
 
+// Define props for the ClassSchedule component
+interface ClassScheduleProps {
+  onEditSchedule?: (item: ScheduleItem) => void;
+}
+
 // Create a grid structure with time slots and days
 const createEmptyScheduleGrid = () => {
   // Default time slots (these can be overridden by added items)
@@ -77,7 +82,7 @@ const getDayColor = (color: string | null) => {
   }
 };
 
-const ClassSchedule = () => {
+const ClassSchedule = ({ onEditSchedule }: ClassScheduleProps) => {
   const [currentMonth, setCurrentMonth] = useState('April 2025');
   const [scheduleData, setScheduleData] = useState(emptyScheduleData);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
@@ -88,7 +93,7 @@ const ClassSchedule = () => {
     let newGrid = createEmptyScheduleGrid();
     
     // Get all unique time slots from items
-    const allTimeSlots = [...new Set(items.map(item => item.time))];
+    const allTimeSlots = Array.from(new Set(items.map(item => item.time)));
     
     // If we have custom time slots not in the default grid, create a new grid with all time slots
     const customTimeSlots = allTimeSlots.filter(
@@ -96,11 +101,11 @@ const ClassSchedule = () => {
     );
     
     if (customTimeSlots.length > 0) {
-      // Get unique set of all time slots (default plus custom)
-      const allUniqueTimeSlots = [...new Set([
-        ...newGrid.map(row => row.time),
-        ...customTimeSlots
-      ])].sort(); // Sort times chronologically
+      // Create a set of unique time slots
+      const defaultTimes = newGrid.map(row => row.time);
+      const allTimes = [...defaultTimes, ...customTimeSlots];
+      // Remove duplicates and sort
+      const allUniqueTimeSlots = Array.from(new Set(allTimes)).sort(); // Sort times chronologically
       
       // Create a completely new grid with all time slots
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -199,10 +204,43 @@ const ClassSchedule = () => {
     return true; // Indicate success
   };
   
+  // Function to update an existing schedule item
+  (window as any).updateScheduleItem = (oldItem: ScheduleItem, newItem: ScheduleItem) => {
+    // Find the item to update
+    const updatedItems = scheduleItems.map(item => {
+      // Match both day and time to identify the exact item
+      if (item.day === oldItem.day && item.time === oldItem.time && item.course === oldItem.course) {
+        return newItem; // Replace with new data
+      }
+      return item;
+    });
+    
+    setScheduleItems(updatedItems);
+    updateScheduleGrid(updatedItems);
+    return true; // Indicate success
+  };
+  
   // Function to clear all schedule items
   const clearSchedule = () => {
     setScheduleItems([]);
     setScheduleData(createEmptyScheduleGrid());
+  };
+  
+  // Function to find a schedule item by day and time for editing
+  const findScheduleItem = (day: string, time: string, course: string): ScheduleItem | undefined => {
+    return scheduleItems.find(item => 
+      item.day === day && item.time === time && item.course === course
+    );
+  };
+  
+  // Handle clicking on a schedule item to edit it
+  const handleEditClick = (day: string, time: string, course: string | null) => {
+    if (!onEditSchedule || !course) return; // Don't trigger edit for empty slots or if no handler
+    
+    const item = findScheduleItem(day, time, course);
+    if (item) {
+      onEditSchedule(item);
+    }
   };
   
   return (
@@ -252,7 +290,10 @@ const ClassSchedule = () => {
                   {row.time}
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`p-2 rounded text-sm ${getColorClasses(row.monday.color)}`}>
+                  <div 
+                    className={`p-2 rounded text-sm ${getColorClasses(row.monday.color)} ${row.monday.title ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleEditClick('Monday', row.time, row.monday.title)}
+                  >
                     <div className="font-medium">
                       {row.monday.title || '-'}
                     </div>
@@ -261,10 +302,16 @@ const ClassSchedule = () => {
                         {row.monday.room}
                       </div>
                     )}
+                    {row.monday.title && (
+                      <div className="text-xs text-gray-500 mt-1">Click to edit</div>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`p-2 rounded text-sm ${getColorClasses(row.tuesday.color)}`}>
+                  <div 
+                    className={`p-2 rounded text-sm ${getColorClasses(row.tuesday.color)} ${row.tuesday.title ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleEditClick('Tuesday', row.time, row.tuesday.title)}
+                  >
                     <div className="font-medium">
                       {row.tuesday.title || '-'}
                     </div>
@@ -273,10 +320,16 @@ const ClassSchedule = () => {
                         {row.tuesday.room}
                       </div>
                     )}
+                    {row.tuesday.title && (
+                      <div className="text-xs text-gray-500 mt-1">Click to edit</div>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`p-2 rounded text-sm ${getColorClasses(row.wednesday.color)}`}>
+                  <div 
+                    className={`p-2 rounded text-sm ${getColorClasses(row.wednesday.color)} ${row.wednesday.title ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleEditClick('Wednesday', row.time, row.wednesday.title)}
+                  >
                     <div className="font-medium">
                       {row.wednesday.title || '-'}
                     </div>
@@ -285,10 +338,16 @@ const ClassSchedule = () => {
                         {row.wednesday.room}
                       </div>
                     )}
+                    {row.wednesday.title && (
+                      <div className="text-xs text-gray-500 mt-1">Click to edit</div>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`p-2 rounded text-sm ${getColorClasses(row.thursday.color)}`}>
+                  <div 
+                    className={`p-2 rounded text-sm ${getColorClasses(row.thursday.color)} ${row.thursday.title ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleEditClick('Thursday', row.time, row.thursday.title)}
+                  >
                     <div className="font-medium">
                       {row.thursday.title || '-'}
                     </div>
@@ -297,10 +356,16 @@ const ClassSchedule = () => {
                         {row.thursday.room}
                       </div>
                     )}
+                    {row.thursday.title && (
+                      <div className="text-xs text-gray-500 mt-1">Click to edit</div>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`p-2 rounded text-sm ${getColorClasses(row.friday.color)}`}>
+                  <div 
+                    className={`p-2 rounded text-sm ${getColorClasses(row.friday.color)} ${row.friday.title ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleEditClick('Friday', row.time, row.friday.title)}
+                  >
                     <div className="font-medium">
                       {row.friday.title || '-'}
                     </div>
@@ -308,6 +373,9 @@ const ClassSchedule = () => {
                       <div className={`text-xs ${getDayColor(row.friday.color)}`}>
                         {row.friday.room}
                       </div>
+                    )}
+                    {row.friday.title && (
+                      <div className="text-xs text-gray-500 mt-1">Click to edit</div>
                     )}
                   </div>
                 </td>
