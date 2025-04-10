@@ -6,12 +6,22 @@ import ScheduleModal from '@/components/announcements/ScheduleModal';
 import { useToast } from '@/hooks/use-toast';
 import type { Announcement } from '@shared/schema';
 
+// Define schedule item interface
+interface ScheduleItem {
+  day: string;
+  time: string;
+  course: string;
+  room: string;
+  color: string;
+}
+
 const Announcements = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [announcementToEdit, setAnnouncementToEdit] = useState<Announcement | undefined>(undefined);
+  const [scheduleToEdit, setScheduleToEdit] = useState<ScheduleItem | undefined>(undefined);
 
   const handleAddAnnouncement = () => {
     setAnnouncementToEdit(undefined);
@@ -19,6 +29,7 @@ const Announcements = () => {
   };
 
   const handleAddSchedule = () => {
+    setScheduleToEdit(undefined);
     setIsScheduleModalOpen(true);
   };
   
@@ -41,30 +52,53 @@ const Announcements = () => {
     setIsAnnouncementModalOpen(true);
   };
 
-  const handleSaveSchedule = (data: any) => {
-    // Add schedule item to the grid via the global function
-    if ((window as any).addScheduleItem) {
-      (window as any).addScheduleItem({
-        day: data.day,
-        time: data.time,
-        course: data.course,
-        room: data.room,
-        color: data.color
-      });
-      
-      // Show success message
-      toast({
-        title: "Schedule Added",
-        description: "The class has been added to the schedule.",
-      });
+  const handleEditSchedule = (scheduleItem: ScheduleItem) => {
+    setScheduleToEdit(scheduleItem);
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleSaveSchedule = (data: ScheduleItem) => {
+    // Check if we're editing an existing item or adding a new one
+    if (scheduleToEdit) {
+      // For editing, we need to update the existing item
+      if ((window as any).updateScheduleItem) {
+        (window as any).updateScheduleItem(scheduleToEdit, data);
+        
+        toast({
+          title: "Schedule Updated",
+          description: "The class schedule has been updated successfully.",
+        });
+      } else {
+        console.log('Failed to update schedule - function not available');
+        toast({
+          title: "Update Failed",
+          description: "There was an issue updating the class schedule.",
+          variant: "destructive"
+        });
+      }
     } else {
-      // Fallback if the function isn't available
-      console.log('Schedule data:', data);
-      toast({
-        title: "Schedule Not Saved",
-        description: "There was an issue adding the class to the schedule.",
-        variant: "destructive"
-      });
+      // For adding a new item
+      if ((window as any).addScheduleItem) {
+        (window as any).addScheduleItem({
+          day: data.day,
+          time: data.time,
+          course: data.course,
+          room: data.room,
+          color: data.color
+        });
+        
+        toast({
+          title: "Schedule Added",
+          description: "The class has been added to the schedule.",
+        });
+      } else {
+        console.log('Schedule data:', data);
+        toast({
+          title: "Schedule Not Saved",
+          description: "There was an issue adding the class to the schedule.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -125,6 +159,7 @@ const Announcements = () => {
         isOpen={isScheduleModalOpen} 
         onClose={() => setIsScheduleModalOpen(false)} 
         onSave={handleSaveSchedule}
+        scheduleToEdit={scheduleToEdit}
       />
     </div>
   );

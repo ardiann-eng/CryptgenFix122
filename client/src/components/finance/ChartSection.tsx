@@ -10,12 +10,23 @@ interface ChartSectionProps {
   isError: boolean;
 }
 
+interface FinanceSummary {
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
+}
+
 const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) => {
   const [chartView, setChartView] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
   const incomeExpenseChartRef = useRef<HTMLCanvasElement>(null);
   const expenseBreakdownChartRef = useRef<HTMLCanvasElement>(null);
   const incomeExpenseChartInstance = useRef<Chart | null>(null);
   const expenseBreakdownChartInstance = useRef<Chart | null>(null);
+  
+  // Fetch financial summary data for balance
+  const { data: financeSummary } = useQuery<FinanceSummary>({
+    queryKey: ['/api/finance/summary'],
+  });
 
   useEffect(() => {
     if (isLoading || isError || !transactions) return;
@@ -32,6 +43,9 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     const incomeData = [500000, 750000, 650000, 800000, 950000, 1100000];
     const expenseData = [300000, 450000, 400000, 350000, 500000, 550000];
+    
+    // Calculate balance data (income - expense)
+    const balanceData = incomeData.map((income, index) => income - expenseData[index]);
 
     // Create Income vs Expense Chart
     if (incomeExpenseChartRef.current) {
@@ -55,6 +69,19 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
                 backgroundColor: '#ef4444', // Red
                 borderColor: '#dc2626',
                 borderWidth: 1
+              },
+              {
+                label: 'Balance',
+                data: balanceData,
+                type: 'line',
+                backgroundColor: 'rgba(34, 197, 94, 0.2)', // Green with transparency
+                borderColor: '#22c55e', // Green
+                borderWidth: 2,
+                fill: true,
+                tension: 0.2,
+                pointBackgroundColor: '#22c55e',
+                pointBorderColor: '#fff',
+                pointRadius: 4
               }
             ]
           },
@@ -74,6 +101,13 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
             plugins: {
               legend: {
                 position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.dataset.label + ': Rp ' + Number(context.raw).toLocaleString();
+                  }
+                }
               }
             }
           }
@@ -128,7 +162,7 @@ const ChartSection = ({ transactions, isLoading, isError }: ChartSectionProps) =
         expenseBreakdownChartInstance.current.destroy();
       }
     };
-  }, [transactions, isLoading, isError, chartView]);
+  }, [transactions, isLoading, isError, chartView, financeSummary]);
 
   if (isLoading) {
     return (
