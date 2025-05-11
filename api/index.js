@@ -48,6 +48,9 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // API routes
+app.get("/", (req, res) => {
+  res.send("API is running!");
+});
 app.get('/api/members', async (req, res) => {
   try {
     const members = await storage.getAllMembers();
